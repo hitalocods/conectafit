@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { ReviewCard } from '../components/ReviewCard';
 import { Button } from '../components/ui/Button';
 import { getProfessionalByIdFromFirestore, listReviews } from '../services/professionalService';
-import { formatCurrency, whatsappUrl } from '../utils/format';
+import { formatCurrency, instagramHandle, instagramUrl, whatsappUrl } from '../utils/format';
 import { fadeUp } from '../utils/animation';
 import type { Professional } from '../types';
 import { useToast } from '../hooks/useToast';
@@ -138,13 +138,13 @@ export default function ProfessionalProfile() {
             )}
             {professional.instagram && (
               <a
-                href={`https://instagram.com/${professional.instagram}`}
+                href={instagramUrl(professional.instagram)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white/70 px-5 py-3 text-sm font-extrabold dark:border-white/10 dark:bg-white/10"
               >
                 <Camera className="h-5 w-5" />
-                Instagram
+                {instagramHandle(professional.instagram)}
               </a>
             )}
           </div>

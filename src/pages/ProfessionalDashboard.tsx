@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
 import { getSavedProfessionalProfile, saveProfessionalProfile } from '../services/professionalService';
 import { fadeUp } from '../utils/animation';
+import { normalizeInstagram } from '../utils/format';
 import { normalizeCityLabel, supportedCities } from '../utils/locations';
 import { createTrialDates, formatPixMessage, getPlanStatus, getTrialDaysLeft, pixPayment } from '../utils/subscription';
 import type { LucideIcon } from 'lucide-react';
@@ -124,7 +125,7 @@ export default function ProfessionalDashboard() {
       city,
       neighborhood,
       whatsapp,
-      instagram: String(form.get('instagram') || '').trim().replace('@', ''),
+      instagram: normalizeInstagram(String(form.get('instagram') || '')),
       startingPrice,
       schedule: String(form.get('schedule') || dashboardProfile.schedule.join(', '))
         .split(',')
@@ -326,7 +327,7 @@ export default function ProfessionalDashboard() {
               ['Especialidade', 'specialty', dashboardProfile.specialty],
               ['Bairro', 'neighborhood', dashboardProfile.neighborhood],
               ['WhatsApp', 'whatsapp', dashboardProfile.whatsapp],
-              ['Instagram', 'instagram', dashboardProfile.instagram],
+              ['Link do Instagram', 'instagram', dashboardProfile.instagram ? `https://instagram.com/${dashboardProfile.instagram}` : ''],
               ['Valor inicial', 'startingPrice', String(dashboardProfile.startingPrice)],
               ['Horarios', 'schedule', dashboardProfile.schedule.join(', ')],
             ].map(([label, name, value]) => (
