@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+
+# production build
+dist/
+
+# local env files
+.env
+.env.*
+!.env.example
+
+# Firebase local cache
+.firebase/
+
+# local screenshots and temporary review assets
+prints-firebase/
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# TypeScript cache
+*.tsbuildinfo
+node_modules/.tmp/

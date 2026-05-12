@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --bg-grid: radial-gradient(circle at 1px 1px, rgba(168, 85, 247, .16) 1px, transparent 0);
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #f6f6f7;
+  touch-action: manipulation;
+}
+
+.dark body {
+  background: #050505;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input,
+select,
+textarea,
+button {
+  font-size: 16px;
+}
+
+@layer components {
+  .glass-panel {
+    border: 1px solid rgb(255 255 255 / 60%);
+    background: rgb(255 255 255 / 72%);
+    box-shadow: 0 24px 80px rgba(0,0,0,.16);
+    backdrop-filter: blur(40px);
+  }
+
+  .dark .glass-panel {
+    border-color: rgb(255 255 255 / 10%);
+    background: rgb(255 255 255 / 7%);
+  }
+
+  .premium-card {
+    border-radius: 28px;
+    border: 1px solid rgb(0 0 0 / 5%);
+    background: #fff;
+    box-shadow: 0 20px 60px rgba(16,16,20,.08);
+    transition: all .2s ease;
+  }
+
+  .dark .premium-card {
+    border-color: rgb(255 255 255 / 10%);
+    background: rgb(255 255 255 / 6%);
+  }
+
+  .section-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus:ring-4 focus:ring-violetGlow/20;
+  }
+}
