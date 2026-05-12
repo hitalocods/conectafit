@@ -11,6 +11,9 @@ import {
   Store,
 } from 'lucide-react';
 import type { Category, Professional, Review } from '../types';
+import { createTrialDates } from '../utils/subscription';
+
+const mockTrial = createTrialDates(new Date('2026-05-01T12:00:00.000Z'));
 
 export const categories: Category[] = [
   { id: 'personal', name: 'Personal Trainers', description: 'Treinos sob medida', icon: Dumbbell, accent: 'from-fitGreen to-emerald-400' },
@@ -55,6 +58,9 @@ export const professionals: Professional[] = [
     students: 48,
     followers: 1320,
     likes: 286,
+    plan: 'pro',
+    planStatus: 'trial',
+    ...mockTrial,
   },
   {
     id: 'marcos-zen',
@@ -84,6 +90,9 @@ export const professionals: Professional[] = [
     students: 36,
     followers: 860,
     likes: 174,
+    plan: 'pro',
+    planStatus: 'trial',
+    ...mockTrial,
   },
   {
     id: 'bella-skin',
@@ -113,6 +122,9 @@ export const professionals: Professional[] = [
     students: 112,
     followers: 2400,
     likes: 521,
+    plan: 'pro',
+    planStatus: 'trial',
+    ...mockTrial,
   },
   {
     id: 'viva-nutri',
@@ -142,6 +154,9 @@ export const professionals: Professional[] = [
     students: 64,
     followers: 1180,
     likes: 233,
+    plan: 'pro',
+    planStatus: 'trial',
+    ...mockTrial,
   },
 ];
 

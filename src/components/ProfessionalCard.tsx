@@ -3,8 +3,11 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight, BadgeCheck, MapPin, Star } from 'lucide-react';
 import type { Professional } from '../types';
 import { formatCurrency } from '../utils/format';
+import { getPlanStatus } from '../utils/subscription';
 
 export function ProfessionalCard({ professional }: { professional: Professional }) {
+  const planStatus = getPlanStatus(professional);
+
   return (
     <motion.article
       whileHover={{ y: -8 }}
@@ -20,10 +23,10 @@ export function ProfessionalCard({ professional }: { professional: Professional 
             className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-          {professional.featured && (
+          {(professional.featured || planStatus !== 'expired') && (
             <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1.5 text-xs font-extrabold text-ink backdrop-blur-xl">
               <BadgeCheck className="h-4 w-4 text-violetGlow" />
-              Destaque
+              {planStatus === 'trial' ? 'Pro gratis' : planStatus === 'active' ? 'Pro' : 'Destaque'}
             </span>
           )}
           <span className="absolute bottom-4 left-4 rounded-full bg-black/55 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-xl">

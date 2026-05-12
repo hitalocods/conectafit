@@ -4,6 +4,7 @@ import { firestoreCollections } from '../firebase/schema';
 import { professionals, reviews } from '../data/mockData';
 import type { Filters, Lead, Professional, Review } from '../types';
 import { normalizeCityLabel } from '../utils/locations';
+import { createTrialDates, getPlanStatus, isPlanVisible } from '../utils/subscription';
 
 function normalizeText(value: string) {
   return value
@@ -45,6 +46,13 @@ function applyFilters(items: Professional[], filters?: Partial<Filters>): Profes
 }
 
 function toProfessional(id: string, data: Partial<Professional>): Professional {
+  const trialDates = data.trialStartedAt && data.trialEndsAt ? { trialStartedAt: data.trialStartedAt, trialEndsAt: data.trialEndsAt } : createTrialDates();
+  const planStatus = getPlanStatus({
+    trialEndsAt: trialDates.trialEndsAt,
+    paidUntil: data.paidUntil,
+    planStatus: data.planStatus || 'trial',
+  });
+
   return {
     id,
     name: data.name || 'Profissional ConectaFit',
@@ -72,18 +80,33 @@ function toProfessional(id: string, data: Partial<Professional>): Professional {
     students: Number(data.students || 0),
     followers: Number(data.followers || 0),
     likes: Number(data.likes || 0),
+    plan: 'pro',
+    planStatus,
+    trialStartedAt: trialDates.trialStartedAt,
+    trialEndsAt: trialDates.trialEndsAt,
+    paidUntil: data.paidUntil,
   };
 }
 
+function sortProfessionals(items: Professional[]) {
+  return [...items].sort((a, b) => {
+    const aVisible = isPlanVisible(a) ? 1 : 0;
+    const bVisible = isPlanVisible(b) ? 1 : 0;
+    if (aVisible !== bVisible) return bVisible - aVisible;
+    if (a.featured !== b.featured) return Number(b.featured) - Number(a.featured);
+    return b.rating - a.rating;
+  });
+}
+
 export function listProfessionals(filters?: Partial<Filters>): Professional[] {
-  return applyFilters(professionals, filters);
+  return sortProfessionals(applyFilters(professionals, filters));
 }
 
 export async function listProfessionalsFromFirestore(filters?: Partial<Filters>): Promise<Professional[]> {
   const snapshot = await getDocs(collection(db, firestoreCollections.professionals));
   const firestoreProfessionals = snapshot.docs.map((item) => toProfessional(item.id, item.data() as Partial<Professional>));
   const merged = [...firestoreProfessionals, ...professionals.filter((mock) => !firestoreProfessionals.some((item) => item.id === mock.id))];
-  return applyFilters(merged, filters);
+  return sortProfessionals(applyFilters(merged, filters));
 }
 
 export function getProfessionalById(id: string): Professional | undefined {

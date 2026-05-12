@@ -1,6 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 
 export type UserRole = 'client' | 'professional';
+export type ProfessionalPlan = 'pro';
+export type ProfessionalPlanStatus = 'trial' | 'active' | 'expired';
 
 export interface AppUser {
   id: string;
@@ -52,6 +54,11 @@ export interface Professional {
   students: number;
   followers: number;
   likes: number;
+  plan: ProfessionalPlan;
+  planStatus: ProfessionalPlanStatus;
+  trialStartedAt: string;
+  trialEndsAt: string;
+  paidUntil?: string;
 }
 
 export interface Lead {

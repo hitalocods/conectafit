@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Eye, Heart, ImagePlus, Lock, MessageSquareReply, MousePointerClick, Save, Star, TrendingUp, Upload, UserPlus, Users } from 'lucide-react';
+import { BadgeCheck, Camera, Copy, Eye, Heart, ImagePlus, Lock, MessageSquareReply, MousePointerClick, QrCode, Save, Star, TrendingUp, Upload, UserPlus, Users } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { professionals, reviews } from '../data/mockData';
 import { useAuth } from '../hooks/useAuth';
@@ -8,6 +8,7 @@ import { useToast } from '../hooks/useToast';
 import { getSavedProfessionalProfile, saveProfessionalProfile } from '../services/professionalService';
 import { fadeUp } from '../utils/animation';
 import { normalizeCityLabel, supportedCities } from '../utils/locations';
+import { createTrialDates, formatPixMessage, getPlanStatus, getTrialDaysLeft, pixPayment } from '../utils/subscription';
 import type { LucideIcon } from 'lucide-react';
 import type { Professional } from '../types';
 
@@ -25,6 +26,9 @@ export default function ProfessionalDashboard() {
   const [photoPreview, setPhotoPreview] = useState(profile.avatarUrl);
   const [isEditing, setIsEditing] = useState(true);
   const [hasPublishedProfile, setHasPublishedProfile] = useState(false);
+  const currentPlanStatus = getPlanStatus(dashboardProfile);
+  const trialDaysLeft = getTrialDaysLeft(dashboardProfile.trialEndsAt);
+  const isExpired = currentPlanStatus === 'expired';
 
   useEffect(() => {
     if (!firebaseUser?.uid) return;
@@ -99,6 +103,7 @@ export default function ProfessionalDashboard() {
 
     const savedProfile: Professional = {
       ...dashboardProfile,
+      ...(dashboardProfile.trialStartedAt && dashboardProfile.trialEndsAt ? {} : createTrialDates()),
       id: firebaseUser?.uid || profile.id,
       name,
       specialty,
@@ -120,6 +125,8 @@ export default function ProfessionalDashboard() {
       homeCare: form.get('homeCare') === 'on',
       onlineCare: form.get('onlineCare') === 'on',
     };
+    savedProfile.plan = 'pro';
+    savedProfile.planStatus = getPlanStatus(savedProfile);
 
     try {
       await saveProfessionalProfile(savedProfile);
@@ -158,6 +165,15 @@ export default function ProfessionalDashboard() {
     );
   }
 
+  async function copyPix(value: string, label: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast(`${label} copiado`, 'Agora e so colar no app do banco.');
+    } catch {
+      toast('Nao consegui copiar', 'Selecione e copie manualmente.');
+    }
+  }
+
   return (
     <div className="section-shell pb-28 pt-8">
       <motion.div {...fadeUp} className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
@@ -187,6 +203,61 @@ export default function ProfessionalDashboard() {
             <p className="mt-1 text-sm font-semibold text-zinc-500 dark:text-zinc-300">{String(label)}</p>
           </div>
         ))}
+      </section>
+
+      <section className="mt-8 grid gap-5 lg:grid-cols-[1fr_.9fr]">
+        <div className="glass-panel rounded-[36px] p-6 sm:p-8">
+          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
+            <div>
+              <p className="text-sm font-extrabold uppercase tracking-[0.2em] text-violetGlow">ConectaFit Pro</p>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight">R$ 25,00/mês</h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                Todo profissional ganha 30 dias gratis a partir da primeira publicacao do perfil. Depois disso, a mensalidade mantem o perfil ativo e com prioridade no marketplace.
+              </p>
+            </div>
+            <span className={`inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 text-sm font-extrabold ${isExpired ? 'bg-red-500/10 text-red-600' : 'bg-fitGreen/15 text-emerald-700 dark:text-fitGreen'}`}>
+              <BadgeCheck className="h-4 w-4" />
+              {currentPlanStatus === 'trial' ? `${trialDaysLeft} dias gratis` : currentPlanStatus === 'active' ? 'Plano ativo' : 'Pagamento pendente'}
+            </span>
+          </div>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            {['Prioridade na busca', 'Perfil com selo Pro', 'Metricas e leads'].map((benefit) => (
+              <div key={benefit} className="rounded-3xl bg-white/70 p-4 text-sm font-bold dark:bg-white/10">
+                {benefit}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {isExpired && (
+          <div className="premium-card p-6">
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-fitGreen dark:bg-white dark:text-ink">
+                <QrCode className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-extrabold">Pagar via Pix</h3>
+                <p className="text-sm font-semibold text-zinc-500 dark:text-zinc-300">Envie o comprovante depois do pagamento.</p>
+              </div>
+            </div>
+            <div className="mt-5 space-y-3 rounded-3xl bg-zinc-50 p-4 dark:bg-white/10">
+              <p className="text-sm"><span className="font-extrabold">Banco:</span> {pixPayment.bank}</p>
+              <p className="text-sm"><span className="font-extrabold">Titular:</span> {pixPayment.receiver}</p>
+              <p className="text-sm"><span className="font-extrabold">Chave Pix:</span> {pixPayment.key}</p>
+              <p className="text-sm"><span className="font-extrabold">Valor:</span> R$ {pixPayment.amount},00</p>
+            </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <Button type="button" onClick={() => void copyPix(pixPayment.key, 'Chave Pix')}>
+                <Copy className="h-5 w-5" />
+                Copiar Pix
+              </Button>
+              <Button type="button" variant="secondary" onClick={() => void copyPix(formatPixMessage(dashboardProfile.name), 'Descricao')}>
+                <Copy className="h-5 w-5" />
+                Copiar descricao
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
       {hasPublishedProfile && !isEditing && (
