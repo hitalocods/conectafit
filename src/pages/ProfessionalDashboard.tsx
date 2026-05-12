@@ -14,6 +14,7 @@ import type { Professional } from '../types';
 
 const profile = professionals[0];
 const maxInlinePhotoSize = 250 * 1024;
+const legacyMockTrialStart = '2026-05-01T12:00:00.000Z';
 
 function cleanPhone(value: string) {
   return value.replace(/\D/g, '');
@@ -34,8 +35,12 @@ export default function ProfessionalDashboard() {
     if (!firebaseUser?.uid) return;
     getSavedProfessionalProfile(firebaseUser.uid).then((existingProfile) => {
       if (existingProfile) {
-        setDashboardProfile(existingProfile);
-        setPhotoPreview(existingProfile.avatarUrl);
+        const normalizedProfile =
+          existingProfile.trialStartedAt === legacyMockTrialStart
+            ? { ...existingProfile, ...createTrialDates(), planStatus: 'trial' as const }
+            : existingProfile;
+        setDashboardProfile(normalizedProfile);
+        setPhotoPreview(normalizedProfile.avatarUrl);
         setHasPublishedProfile(true);
         setIsEditing(false);
       } else {
@@ -101,9 +106,17 @@ export default function ProfessionalDashboard() {
       return;
     }
 
+    const trialDates =
+      hasPublishedProfile && dashboardProfile.trialStartedAt && dashboardProfile.trialStartedAt !== legacyMockTrialStart
+        ? {
+            trialStartedAt: dashboardProfile.trialStartedAt,
+            trialEndsAt: dashboardProfile.trialEndsAt,
+          }
+        : createTrialDates();
+
     const savedProfile: Professional = {
       ...dashboardProfile,
-      ...(dashboardProfile.trialStartedAt && dashboardProfile.trialEndsAt ? {} : createTrialDates()),
+      ...trialDates,
       id: firebaseUser?.uid || profile.id,
       name,
       specialty,
