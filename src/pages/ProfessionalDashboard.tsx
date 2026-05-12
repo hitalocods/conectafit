@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BadgeCheck, Camera, Copy, Eye, Heart, ImagePlus, Lock, MessageSquareReply, MousePointerClick, QrCode, Save, Star, TrendingUp, Upload, UserPlus, Users } from 'lucide-react';
+import { BadgeCheck, Copy, Eye, Heart, Lock, MessageSquareReply, MousePointerClick, QrCode, Save, Star, TrendingUp, Upload, UserPlus, Users } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { professionals, reviews } from '../data/mockData';
 import { useAuth } from '../hooks/useAuth';
@@ -472,25 +472,6 @@ export default function ProfessionalDashboard() {
         </form>
 
         <div className="space-y-6">
-          <div className="premium-card p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-extrabold">Galeria</h2>
-              <button aria-label="Adicionar foto" className="grid h-11 w-11 place-items-center rounded-full bg-ink text-white dark:bg-white dark:text-ink">
-                <ImagePlus className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              {dashboardProfile.gallery.map((image) => (
-                <div key={image} className="relative overflow-hidden rounded-3xl">
-                  <img src={image} alt="Galeria" className="aspect-square object-cover" />
-                  <div className="absolute bottom-2 right-2 grid h-9 w-9 place-items-center rounded-full bg-white/80 backdrop-blur-xl">
-                    <Camera className="h-4 w-4 text-ink" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           <div className="premium-card p-6">
             <h2 className="text-xl font-extrabold">Responder avaliacoes</h2>
             <div className="mt-5 space-y-3">

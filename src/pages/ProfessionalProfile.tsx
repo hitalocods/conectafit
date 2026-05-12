@@ -151,19 +151,6 @@ export default function ProfessionalProfile() {
         </div>
       </motion.section>
 
-      <section className="mt-10 grid gap-4 md:grid-cols-3">
-        {professional.gallery.map((image) => (
-          <motion.img
-            {...fadeUp}
-            key={image}
-            src={image}
-            alt={`Galeria de ${professional.name}`}
-            loading="lazy"
-            className="aspect-[4/3] rounded-[30px] object-cover shadow-premium"
-          />
-        ))}
-      </section>
-
       <section className="mt-12 grid gap-6 lg:grid-cols-[.75fr_1.25fr]">
         <div className="premium-card p-6">
           <h2 className="text-xl font-extrabold">Horarios e modalidades</h2>
